@@ -1,16 +1,16 @@
 
 # Sovereign AI — local stack, stage 1: Ollama (native) + OpenWebUI (Docker)
 #!/bin/bash
-
-STACK_DIR=$(~/MANU/projects/sovereign-ai)
-cd $STACK_DIR
+set -e
+STACK_DIR=$HOME/MANU/projects/sovereign-ai
+cd "$STACK_DIR"
 
 echo "Starting stack via Docker Compose..."
 docker compose up -d
 
 echo "Waiting for Ollama..."
 is_ollama_up=false
-for i in 1 2 3 4 5;do
+for i in $(seq 1 60);do
 	if curl -fs http://localhost:11434/api/tags > /dev/null; then
 		echo "Ollama is up"
 		is_ollama_up=true
@@ -24,8 +24,9 @@ if [ "$is_ollama_up" = false ]; then
 fi
 is_openwebui_up=false
 echo "Waiting for OpenWebUI server..."
-for i in 1 2 3 4 5;do
-	if curl -sf http://localhost:8080 > /dev/null; then
+for i in $(seq 1 100);do
+	status=$(docker inspect -f '{{.State.Health.Status}}' open-webui)
+	if [ "$status" = "healthy" ]; then
 		echo "OpenWebUI is up"
 		is_openwebui_up=true
 		break
