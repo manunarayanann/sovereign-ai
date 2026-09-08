@@ -1,0 +1,13 @@
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:v0.11.0
+    container_name: open-webui
+    network_mode: host
+    environment:
+      - OLLAMA_BASE_URL=http://127.0.0.1:11434
+    volumes:
+      - open-webui:/app/backend/data
+    restart: unless-stopped
+
+volumes:
+  open-webui:
